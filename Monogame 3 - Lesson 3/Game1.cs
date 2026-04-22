@@ -2,8 +2,9 @@
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 
- 
+
 
 namespace Monogame_3___Lesson_3
 {
@@ -17,6 +18,7 @@ namespace Monogame_3___Lesson_3
         Vector2 brownTribbleSpeed, orangeTribbleSpeed, greyTribbleSpeed, creamTribbleSpeed;
         Rectangle window;
         SoundEffect tribbleCoo;
+        Random rand = new Random();
 
         public Game1()
         {
@@ -64,7 +66,8 @@ namespace Monogame_3___Lesson_3
             browntribblerect.X += (int)brownTribbleSpeed.X;
             if (browntribblerect.Right > window.Width || browntribblerect.Left <= 0)
             {
-                brownTribbleSpeed.X *= -1;
+                browntribblerect.X = rand.Next(0, window.Width - browntribblerect.Width);
+                brownTribbleSpeed.X += rand.Next(-1, 3);
                 tribbleCoo.Play();
             }
 
@@ -72,13 +75,15 @@ namespace Monogame_3___Lesson_3
             browntribblerect.Y += (int)brownTribbleSpeed.Y;
             if (browntribblerect.Bottom > window.Height || browntribblerect.Top <= 0)
             {
-                brownTribbleSpeed.Y *= -1;
+                browntribblerect.Y = rand.Next(0, window.Height - browntribblerect.Height);
+                brownTribbleSpeed.Y += rand.Next(-1, 3);
             }
 
             orangetribblerect.X += (int)orangeTribbleSpeed.X;
             if (orangetribblerect.Right > window.Width || orangetribblerect.Left <= 0)
             {
                 orangeTribbleSpeed.X *= -1;
+
             }
 
             greytribblerect.Y += (int)greyTribbleSpeed.Y;
