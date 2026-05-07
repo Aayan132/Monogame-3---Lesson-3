@@ -8,6 +8,13 @@ using System;
 
 namespace Monogame_3___Lesson_3
 {
+
+    enum Screen
+    {
+        Intro,
+        Main,
+        End
+    }
     public class Game1 : Game
     {
         private GraphicsDeviceManager _graphics;
@@ -18,7 +25,13 @@ namespace Monogame_3___Lesson_3
         Vector2 brownTribbleSpeed, orangeTribbleSpeed, greyTribbleSpeed, creamTribbleSpeed;
         Rectangle window;
         SoundEffect tribbleCoo;
+        SpriteFont text;
+        Double timer = 20.0;
         Random rand = new Random();
+
+        Screen currentScreen;
+
+        MouseState mouseState;
 
         public Game1()
         {
@@ -36,12 +49,13 @@ namespace Monogame_3___Lesson_3
             _graphics.PreferredBackBufferWidth = window.Width;
             _graphics.PreferredBackBufferHeight = window.Height;
             _graphics.ApplyChanges();
-            browntribblerect = new Rectangle(300, 10, 100, 100);
+            browntribblerect = new Rectangle(rand.Next(0, window.Width - 100), rand.Next(0, window.Height - 100), 100, 100); ;
             brownTribbleSpeed = new Vector2(4, 2);
-            orangetribblerect = new Rectangle(300, 10, 100, 100);
+            orangetribblerect = new Rectangle(rand.Next(0, window.Width - 100), rand.Next(0, window.Height - 100), 100, 100); ;
             orangeTribbleSpeed = new Vector2(2, 0);
-            greytribblerect = new Rectangle(300, 10, 100, 100);
+            greytribblerect = new Rectangle(rand.Next(0, window.Width - 100), rand.Next(0, window.Height - 100), 100, 100); ;
             greyTribbleSpeed = new Vector2(0, 2);
+            currentScreen = Screen.Intro;
             base.Initialize();
         }
 
@@ -53,54 +67,94 @@ namespace Monogame_3___Lesson_3
             tribbleBrownTexture = Content.Load<Texture2D>("tribbleBrown");
             tribbleOrangeTexture = Content.Load<Texture2D>("tribbleOrange");
             tribbleGreyTexture = Content.Load<Texture2D>("tribbleGrey");
+            text = Content.Load<SpriteFont>("Title");
+
 
             // TODO: use this.Content to load your game content here
         }
 
         protected override void Update(GameTime gameTime)
         {
+            mouseState = Mouse.GetState();
+
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // TODO: Add your update logic here
-            browntribblerect.X += (int)brownTribbleSpeed.X;
-            if (browntribblerect.Right > window.Width || browntribblerect.Left <= 0)
+            if (currentScreen == Screen.Intro)
             {
-                browntribblerect.X = rand.Next(0, window.Width - browntribblerect.Width);
-                brownTribbleSpeed.X += rand.Next(-1, 3);
-                tribbleCoo.Play();
+                if (mouseState.LeftButton == ButtonState.Pressed)
+                {
+                    currentScreen = Screen.Main;
+                    timer = 20.0;
+                }
             }
-
-
-            browntribblerect.Y += (int)brownTribbleSpeed.Y;
-            if (browntribblerect.Bottom > window.Height || browntribblerect.Top <= 0)
+            else if (currentScreen == Screen.Main)
             {
-                browntribblerect.Y = rand.Next(0, window.Height - browntribblerect.Height);
-                brownTribbleSpeed.Y += rand.Next(-1, 3);
-            }
+                // TODO: Add your update logic 
 
-            orangetribblerect.X += (int)orangeTribbleSpeed.X;
-            if (orangetribblerect.Right > window.Width || orangetribblerect.Left <= 0)
-            {
-                orangeTribbleSpeed.X *= -1;
+                if (timer <= 0)
+                {
+                    currentScreen = Screen.End;
+                }
 
-            }
+                browntribblerect.X += (int)brownTribbleSpeed.X;
+                if (browntribblerect.Right > window.Width || browntribblerect.Left <= 0)
+                {
+                    browntribblerect.X = rand.Next(0, window.Width - browntribblerect.Width);
+                    brownTribbleSpeed.X += rand.Next(-1, 3);
+                    tribbleCoo.Play();
+                }
 
-            greytribblerect.Y += (int)greyTribbleSpeed.Y;
-            if (greytribblerect.Bottom > window.Height || greytribblerect.Top <= 0)
-            {
-                greyTribbleSpeed.Y *= -1;
-            }
-            base.Update(gameTime);
+
+
+                browntribblerect.Y += (int)brownTribbleSpeed.Y;
+                if (browntribblerect.Bottom > window.Height || browntribblerect.Top <= 0)
+                {
+                    browntribblerect.Y = rand.Next(0, window.Height - browntribblerect.Height);
+                    brownTribbleSpeed.Y += rand.Next(-1, 3);
+                }
+
+
+                greytribblerect.Y += (int)greyTribbleSpeed.Y;
+                if (greytribblerect.Bottom > window.Height || greytribblerect.Top <= 0)
+                {
+                    greyTribbleSpeed.Y *= -1;
+                }
+
+                orangetribblerect.X += (int)orangeTribbleSpeed.X;
+
+                if (orangetribblerect.Left > window.Width)
+                {
+                    orangetribblerect.X = -orangetribblerect.Width;
+                }
+                else if (orangetribblerect.Right < 0)
+                {
+                    orangetribblerect.X = window.Width;
+                }
+            } 
+
+
+                base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
             _spriteBatch.Begin();
-            _spriteBatch.Draw(tribbleBrownTexture, browntribblerect, Color.White);
-            _spriteBatch.Draw(tribbleOrangeTexture, orangetribblerect, Color.White);
-            _spriteBatch.Draw(tribbleGreyTexture, greytribblerect, Color.White);
+
+
+            if (currentScreen == Screen.Intro)
+            {
+                _spriteBatch.DrawString(text, "Press Right Click to Proceed", new Vector2(100, 100), Color.White);
+            }
+            else if (currentScreen == Screen.Main)
+            {
+                _spriteBatch.Draw(tribbleBrownTexture, browntribblerect, Color.White);
+                _spriteBatch.Draw(tribbleOrangeTexture, orangetribblerect, Color.White);
+                _spriteBatch.Draw(tribbleGreyTexture, greytribblerect, Color.White);
+            }
+
+
 
             _spriteBatch.End();
             
